@@ -18,7 +18,6 @@ All scripts are run from the repository root. Paths are controlled by three envi
 | `EMB_DIR` | `./embeddings` | cached model embeddings |
 | `FIG_DIR` | `./figures` | output figures (one subfolder per figure) |
 
-Figures use LaTeX for text if a `latex` binary is found, and fall back to matplotlib's renderer otherwise.
 
 ## Datasets
 
