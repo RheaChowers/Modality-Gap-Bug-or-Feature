@@ -92,15 +92,11 @@ step and needs tens of GB of disk per model.
 
 The gap-closing algorithm (Sec. 4, Eq. 11) is `utils.orthogonal_gap`; robustness (Eq. 12) is `utils.robustness`.
 
-Runtime notes: the sphere setting of Fig 4 runs 10^7 SGD steps by default (pass `--n_iters` for a quick run);
-Fig 6 (right) runs 50 random initializations of CLIP over 5000 Flickr30k pairs; Figs 8 and 10 average over
-K = 100 and K = 500 noise samples. A GPU is recommended for all but Figs 3 and 5.
-
 ## Notes
 
-- The Gaussian noise in Fig 8 is `sigma * N(0, I)` with `sigma` in {0.005, 0.0225, 0.04}. The paper's legend labels these values as σ², but they are standard deviations.
-- The top panel of Fig 5 (initial clusters coloured by S^y_i) is a reimplementation; the original figure was not produced with this code.
-- Fig 1b (an ImageNet image misclassified under a different prompt template) is an illustrative example and has no script.
+- The Gaussian noise in Fig 8 is $\sigma \cdot \mathcal{N}(0, I)$ with $\sigma$ in {0.005, 0.0225, 0.04}. 
+- The top panel of Fig 5 (initial clusters coloured by $S^y_i$) is a reimplementation; the original figure was not produced with this code.
+
 
 ## Citation
 
