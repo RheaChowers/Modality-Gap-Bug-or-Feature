@@ -1,6 +1,6 @@
 """Embed A-OKVQA (val) for CLIP-style multiple-choice VQA (texts are "<question> <answer>").
 
-Per model, saves to $EMB_DIR/aokvqa/<model>-<pretrained>/:
+Per model, saves raw (unnormalized) embeddings to $EMB_DIR/aokvqa/<model>-<pretrained>/:
   image_embeddings.pt      one embedding per question image
   answers.pt, answer_lens.pt, labels.pt
                            the multiple-choice options (concatenated), #options and index of the correct one
@@ -28,7 +28,7 @@ def encode_text(model, tokenizer, texts, batch_size=256):
     out = []
     for i in range(0, len(texts), batch_size):
         f = model.encode_text(tokenizer(texts[i:i + batch_size]).to(DEVICE))
-        out.append((f / f.norm(dim=-1, keepdim=True)).cpu())
+        out.append(f.cpu())
     return torch.cat(out)
 
 
@@ -62,7 +62,7 @@ def main(split="val"):
 
             image = Image.open(os.path.join(DATA_DIR, "coco", f"{split}2017", f"{e['image_id']:012}.jpg")).convert("RGB")
             f = model.encode_image(preprocess(image).unsqueeze(0).to(DEVICE))
-            images.append((f / f.norm(dim=-1, keepdim=True)).cpu())
+            images.append(f.cpu())
 
         torch.save(torch.cat(images), os.path.join(outdir, "image_embeddings.pt"))
         torch.save(torch.cat(answers), os.path.join(outdir, "answers.pt"))

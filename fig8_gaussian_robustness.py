@@ -16,7 +16,7 @@ from tqdm import tqdm
 from utils import accuracy, fig_path, gap, load_embeddings, orthogonal_gap, robustness, set_style
 from vqa import load_vqa, predict
 
-NOISE_LEVELS = [0.005, 0.0225, 0.04]  # noise = level * N(0, I); the paper's legend reports these values as sigma^2
+NOISE_LEVELS = [0.005, 0.0225, 0.04]  # sigma: noise = sigma * N(0, I) (the paper's legend mislabels these as sigma^2)
 K = 100
 ZERO_SHOT = [("cifar10", "ViT-L-14-openai"), ("cifar100", "ViT-B-16-openai")]
 VQA = ["ViT-B-16-openai", "ViT-B-16-SigLIP-webli"]
@@ -31,7 +31,7 @@ def alpha_range(txts, ims, direction, min_alpha=-5.0, n=100):
 
 
 def plot_legends(ax, lines, extra):
-    leg = ax.legend(handles=lines, title=r"$\sigma^2$", loc="upper right")
+    leg = ax.legend(handles=lines, title=r"$\sigma$", loc="upper right")
     ax.add_artist(leg)
     ax.legend(handles=extra, loc="lower right")
     ax.set_ylim(0, 100)

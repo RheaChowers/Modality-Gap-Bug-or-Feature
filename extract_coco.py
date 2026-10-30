@@ -1,6 +1,6 @@
 """Embed the MS-COCO val2017 images and all of their captions with Hugging Face CLIP-like models.
 
-Saves image_embeddings.pt, text_embeddings.pt (captions of image i are contiguous) and
+Saves raw (unnormalized) image_embeddings.pt, text_embeddings.pt (captions of image i are contiguous) and
 labels.pt (number of captions per image) to $EMB_DIR/coco/<model>/.
 
     python extract_coco.py
@@ -44,8 +44,8 @@ def main(args):
         outdir = os.path.join(EMB_DIR, "coco", name)
         os.makedirs(outdir, exist_ok=True)
         images, texts = torch.cat(images), torch.cat(texts)
-        torch.save(images / images.norm(dim=-1, keepdim=True), os.path.join(outdir, "image_embeddings.pt"))
-        torch.save(texts / texts.norm(dim=-1, keepdim=True), os.path.join(outdir, "text_embeddings.pt"))
+        torch.save(images, os.path.join(outdir, "image_embeddings.pt"))
+        torch.save(texts, os.path.join(outdir, "text_embeddings.pt"))
         torch.save(torch.tensor(lens), os.path.join(outdir, "labels.pt"))
 
 

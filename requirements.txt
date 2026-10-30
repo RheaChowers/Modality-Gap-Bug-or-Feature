@@ -1,0 +1,10 @@
+torch
+torchvision
+open_clip_torch
+transformers
+pycocotools
+matplotlib
+seaborn
+pandas
+pillow
+tqdm

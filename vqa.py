@@ -7,7 +7,7 @@ import os
 
 import torch
 
-from utils import DEVICE, EMB_DIR
+from utils import DEVICE, EMB_DIR, normalize
 
 PAD = 1000.0  # padding value for questions with fewer options; never a nearest neighbour
 
@@ -15,8 +15,8 @@ PAD = 1000.0  # padding value for questions with fewer options; never a nearest 
 def load_vqa(modelname):
     d = os.path.join(EMB_DIR, "aokvqa", modelname)
     load = lambda n: torch.load(os.path.join(d, f"{n}.pt"), weights_only=True)
-    answers, answer_lens, labels = load("answers"), load("answer_lens"), load("labels")
-    ims = load("image_embeddings")
+    answers, answer_lens, labels = normalize(load("answers").float()), load("answer_lens"), load("labels")
+    ims = normalize(load("image_embeddings").float())
     n, dim = ims.shape
 
     options = torch.full((n, int(answer_lens.max()), dim), PAD)
@@ -31,7 +31,7 @@ def load_vqa(modelname):
         options[i, :l] = cur
         start += l
     return dict(ims=ims.to(DEVICE), options=options.to(DEVICE), gaps=gaps.to(DEVICE), labels=labels.to(DEVICE),
-                rephrasings=load("rephrasings"), rephrasing_lens=load("rephrasing_lens"), dir=d)
+                rephrasings=normalize(load("rephrasings").float()), rephrasing_lens=load("rephrasing_lens"), dir=d)
 
 
 def predict(ims, options):

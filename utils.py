@@ -44,9 +44,17 @@ def fig_path(*parts):
     return path
 
 
+def normalize(x):
+    return x / x.norm(dim=-1, keepdim=True)
+
+
 def load_embeddings(dataset, modelname, *names):
-    """Load tensors saved by the extract_*.py scripts, e.g. load_embeddings('cifar10', 'ViT-B-16-openai', 'image_embeddings')."""
-    return [torch.load(os.path.join(EMB_DIR, dataset, modelname, f"{n}.pt"), weights_only=True).to(DEVICE) for n in names]
+    """Load tensors saved by the extract_*.py scripts, e.g. load_embeddings('cifar10', 'ViT-B-16-openai', 'image_embeddings').
+
+    Embeddings are stored unnormalized and projected to the unit sphere here; other tensors (labels) are returned as is.
+    """
+    tensors = [torch.load(os.path.join(EMB_DIR, dataset, modelname, f"{n}.pt"), weights_only=True).to(DEVICE) for n in names]
+    return [normalize(t.float()) if n.endswith("embeddings") else t for n, t in zip(names, tensors)]
 
 
 def sq_dists(a, b):

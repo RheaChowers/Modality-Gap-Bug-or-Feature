@@ -12,7 +12,7 @@ import torch
 from matplotlib import pyplot as plt
 from tqdm import tqdm
 
-from utils import DEVICE, fig_path, set_style
+from utils import DEVICE, fig_path, normalize, set_style
 from vqa import load_vqa, predict
 
 MODELS = ["ViT-B-16-openai", "ViT-B-16-SigLIP-webli"]
@@ -36,7 +36,8 @@ def sample_noisy_options(d, wrong, wrong_lens, n_wrong=3):
 def main(modelname):
     d = load_vqa(modelname)
     n = d["ims"].shape[0]
-    wrong = [torch.load(os.path.join(d["dir"], "wrong_answers", f"{i}.pt"), weights_only=True) for i in tqdm(range(n), desc="loading")]
+    wrong = [normalize(torch.load(os.path.join(d["dir"], "wrong_answers", f"{i}.pt"), weights_only=True).float())
+             for i in tqdm(range(n), desc="loading")]
     wrong_lens, wrong = torch.tensor([w.shape[0] for w in wrong]), torch.cat(wrong)
 
     acc = lambda options, a: 100 * (predict(d["ims"] + a * d["gaps"], options) == d["labels"]).float().mean().item()

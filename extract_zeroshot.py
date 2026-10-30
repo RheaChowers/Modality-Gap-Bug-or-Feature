@@ -1,6 +1,6 @@
 """Embed CIFAR10 / CIFAR100 / ImageNet (val) images and class prompts with open_clip models.
 
-Saves image_embeddings.pt, text_embeddings.pt, classes.pt (all L2-normalized) to
+Saves image_embeddings.pt, text_embeddings.pt, classes.pt (raw, unnormalized) to
 $EMB_DIR/<dataset>/<model>-<pretrained>/.
 
     python extract_zeroshot.py --dataset cifar10
@@ -16,7 +16,7 @@ from torchvision import datasets
 from tqdm import tqdm
 
 from classnames import CIFAR10, CIFAR100, IMAGENET
-from utils import DATA_DIR, DEVICE, EMB_DIR, OPENCLIP_MODELS
+from utils import DATA_DIR, DEVICE, EMB_DIR, OPENCLIP_MODELS, normalize
 
 TEMPLATES = {"cifar10": "a photo of a {}", "cifar100": "a candid {} digital photo", "imagenet": "a photo of a {}"}
 
@@ -50,15 +50,14 @@ def main(args):
 
         prompts = make_prompts(args.dataset, args.template or TEMPLATES[args.dataset], classnames)
         text = model.encode_text(tokenizer(prompts).to(DEVICE))
-        text = text / text.norm(dim=-1, keepdim=True)
 
         images, labels = [], []
         for x, y in tqdm(DataLoader(dataset, batch_size=args.batch_size, num_workers=args.workers)):
             f = model.encode_image(x.to(DEVICE))
-            images.append((f / f.norm(dim=-1, keepdim=True)).cpu())
+            images.append(f.cpu())
             labels.append(y)
         images, labels = torch.cat(images), torch.cat(labels)
-        print("zero-shot accuracy:", ((images @ text.cpu().T).argmax(1) == labels).float().mean().item())
+        print("zero-shot accuracy:", ((normalize(images) @ normalize(text.cpu()).T).argmax(1) == labels).float().mean().item())
 
         torch.save(text.cpu(), os.path.join(outdir, "text_embeddings.pt"))
         torch.save(images, os.path.join(outdir, "image_embeddings.pt"))

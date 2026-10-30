@@ -8,15 +8,11 @@
 import torch
 from matplotlib import pyplot as plt
 
-from utils import fig_path, gap, load_embeddings, nearest, set_style
+from utils import fig_path, gap, load_embeddings, nearest, normalize, set_style
 
 IMAGENET_MODELS = {"ViT-B-16-SigLIP-webli": "SigLIP", "ViT-B-16-openai": "CLIP (ViT-B16)", "ViT-L-14-openai": "CLIP (ViT-L14)"}
 COCO_MODELS = {"metaclip": "MetaCLIP (ViT-L14)", "clip": "CLIP (ViT-L14)", "siglip": "SigLIP"}
 ALPHAS = torch.linspace(-1, 1, 21)
-
-
-def normalize(x):
-    return x / x.norm(dim=-1, keepdim=True)
 
 
 def zero_shot_accuracy(ims, txts, labels):
